@@ -3,13 +3,42 @@ import os
 #Esto es una calculadora de sistemas de ecuaciones usando el metodo de Gauss Seidel
 flag = True
 
+
+def Gaussiana():
+    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
+    matrizA = np.zeros((size, size + 1), dtype=float)
+
+    for i in range(size):
+        for j in range(size + 1):
+            matrizA[i][j] = int(input(f"Ingresa el elemento de la posicion ({i+1}, {j+1}): "))
+
+    for k in range(size):
+        for i in range(k+1, size):
+            factor = matrizA[i][k] / matrizA[k][k]
+            for j in range(k, size+1):
+                matrizA[i][j] = matrizA[i][j] - (factor * matrizA[k][j])
+
+    terminos_independientes = matrizA[:, -1]
+
+    for i in range(size - 1, -1, -1):
+        suma = 0
+        for j in range(i + 1, size):
+            suma += matrizA[i][j] * terminos_independientes[j]
+        terminos_independientes[i] = (matrizA[i][-1] - suma) / matrizA[i][i]
+
+    print(terminos_independientes)
+
+
+
+
+
 def Gauss_Seidel():
     size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size), dtype=float)
-    matrizB = np.zeros(size, dtype=float)
-    valuesX = np.zeros(size, dtype=float)
-    PastValues = np.zeros(size, dtype=float)
-    Errors = np.full(size, 100, dtype=float)
+    matrizA = np.zeros((size, size), dtype=np.float64)
+    matrizB = np.zeros(size, dtype=np.float64)
+    valuesX = np.zeros(size, dtype=np.float64)
+    PastValues = np.zeros(size, dtype=np.float64)
+    Errors = np.full(size, 100, dtype=np.float64)
     iteracion = 0
 
     #Se procede a pedir los datos al usuario
@@ -47,17 +76,20 @@ def Gauss_Seidel():
             for j in range(size):
                 if (j != i):
                     sum = sum + matrizA[i, j] * valuesX[j]
-            
+
             valuesX[i] = (matrizB[i] - sum) / diagonal[i]
 
         for i in range(size):
             Errors[i] = np.abs((valuesX[i] - PastValues[i]) / valuesX[i]) * 100
 
+    for i in range(size):
+        print(f"El valor de X{i + 1} es: {valuesX[i]}")
+
 
     for i in range(size):
         print(f"El valor de X{i+1} es: {valuesX[i]}")
 
-def Gaussiana():
+def Gauss_Jordan():
     size = int(input("Ingresa el tamaño del sistema de ecuaciones"))
     matrizA = np.zeros((size, size + 1), dtype=float)
     
@@ -65,7 +97,6 @@ def Gaussiana():
         for j in range(size + 1):
             matrizA[i , j] = float(input(f"Ingresa el valor de la posicion ({i+1}, {j+1}): "))
 
-    pivote = matrizA[0,0]
 
     for i in range(size):
         matrizA[i] = matrizA[i] / matrizA[i,i]
@@ -80,7 +111,8 @@ def Gaussiana():
 
 def menu():
     print("1. Calculadora mediante Gauss Seidel")
-    print("2. Calculadora mediante montante")
+    print("2. Calculadora mediante Gauss - Jordan")
+    print("3, Calculadora mediante el metodo Gaussiano")
 
 
 while flag:
@@ -90,7 +122,9 @@ while flag:
     opcion = int(input("Ingresa la opción deseada: "))
     if opcion == 1:
         Gauss_Seidel()
-    if opcion == 2:
+    elif opcion == 2:
+        Gauss_Jordan()
+    elif opcion == 3:
         Gaussiana()
 
 
