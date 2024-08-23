@@ -40,6 +40,7 @@ def Gauss_Seidel():
     PastValues = np.zeros(size, dtype=np.float64)
     Errors = np.full(size, 100, dtype=np.float64)
     iteracion = 0
+    dominante = True
 
     #Se procede a pedir los datos al usuario
     for i in range(size):
@@ -57,37 +58,43 @@ def Gauss_Seidel():
 
     #Falta verificar que la diagonal no sea cero y que sea diagonalmente dominante
 
-    """
-    for i in range(size):
-        if (diagonal[i] == 0.0):
-            raise ValueError(f"El elemento de la diagonal {i} es 0. Considera reorganiar las filas")
-
-    """
-
-    while np.any(np.abs(Errors) > Error_Deseado):
-
-        iteracion = iteracion + 1
-
-        for i in range(size):
-            PastValues[i] = valuesX[i]
-
-        for i in range(size):
-            sum = 0
-            for j in range(size):
-                if (j != i):
-                    sum = sum + matrizA[i, j] * valuesX[j]
-
-            valuesX[i] = (matrizB[i] - sum) / diagonal[i]
-
-        for i in range(size):
-            Errors[i] = np.abs((valuesX[i] - PastValues[i]) / valuesX[i]) * 100
-
-    for i in range(size):
-        print(f"El valor de X{i + 1} es: {valuesX[i]}")
 
 
     for i in range(size):
-        print(f"El valor de X{i+1} es: {valuesX[i]}")
+        sum = 0
+        for j in range(size):
+            if(i != j):
+                sum = sum + matrizA[i][j]
+
+        if (diagonal[i] < sum):
+            dominante = False
+
+    if dominante == True:
+        while np.any(np.abs(Errors) > Error_Deseado):
+
+            iteracion = iteracion + 1
+
+            for i in range(size):
+                PastValues[i] = valuesX[i]
+
+            for i in range(size):
+                sum = 0
+                for j in range(size):
+                    if (j != i):
+                        sum = sum + matrizA[i, j] * valuesX[j]
+
+                valuesX[i] = (matrizB[i] - sum) / diagonal[i]
+
+            for i in range(size):
+                Errors[i] = np.abs((valuesX[i] - PastValues[i]) / valuesX[i]) * 100
+
+        for i in range(size):
+            print(f"El valor de X{i + 1} es: {valuesX[i]}")
+    else:
+        print("El sistema no es dominante. Intenta reordenar el sistema y vuelve a ingresarlo")
+
+
+
 
 def Gauss_Jordan():
     size = int(input("Ingresa el tamaño del sistema de ecuaciones"))
@@ -131,6 +138,7 @@ while flag:
     resp = input("¿Quieres ingresar otro sistema de ecuaciones? (S/N): ")
     if(resp == "N" or resp == "n"):
         flag = False
+
 
     
 
