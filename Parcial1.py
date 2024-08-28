@@ -18,7 +18,7 @@ def Gaussiana():
 
     # Verificar si hay un 0 en la diagonal principal
     for fila in range(size):
-        if np.isclose(diagonal[fila], 0):
+        if diagonal[fila] == 0:
             flag = True
             # Intentar intercambiar filas
             for k in range(fila + 1, size):
@@ -31,7 +31,7 @@ def Gaussiana():
     if not flag:
         for k in range(size):
             for i in range(k + 1, size):
-                if not np.isclose(matrizA[k, k], 0):  # Evitar división por 0
+                if matrizA[k][k] != 0:  # Evitar división por 0
                     factor = matrizA[i][k] / matrizA[k][k]
                     for j in range(k, size + 1):
                         matrizA[i][j] = matrizA[i][j] - (factor * matrizA[k][j])
@@ -52,7 +52,8 @@ def Gaussiana():
                 return
 
         print("Soluciones:")
-        print(terminos_independientes)
+        for i in range(len(terminos_independientes)):
+            print(f"X{i+1} = {terminos_independientes[i]}")
     else:
         print("No se pudo evitar un 0 en la diagonal. Modifica el sistema para que no haya un 0 en la diagonal")
 
@@ -60,7 +61,7 @@ def Gaussiana():
 
 def Gauss_Seidel():
     size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size), dtype=float)
+    matrizA = np.zeros((size, size+1), dtype=float)
     matrizB = np.zeros(size, dtype=float)
     valuesX = np.zeros(size, dtype=float)
     PastValues = np.zeros(size, dtype=float)
@@ -69,11 +70,10 @@ def Gauss_Seidel():
 
     # Solicitud de datos
     for i in range(size):
-        for j in range(size):
+        for j in range(size+1):
             matrizA[i, j] = float(input(f"Ingrese el valor para la posición ({i + 1}, {j + 1}): "))
 
-    for i in range(size):
-        matrizB[i] = float(input(f"Ingresa los términos independientes del sistema de ecuaciones de la fila {i + 1}: "))
+    matrizB = matrizA[:, -1]
 
     Error_Deseado = float(input("Ingresa el error deseado: "))
 
@@ -81,9 +81,10 @@ def Gauss_Seidel():
     def es_dominante(matriz):
         diagonal = np.diagonal(matriz)
         for i in range(size):
-            suma = np.sum(np.abs(matriz[i])) - np.abs(diagonal[i])
-            if np.abs(diagonal[i]) < suma:
-                return False
+            for j in range(size - 1):
+                suma = np.sum(np.abs(matrizA[i][j])) - np.abs(diagonal[i])
+                if np.abs(diagonal[i]) < suma:
+                    return False
         return True
 
     # Reordenamiento de la matriz
@@ -93,7 +94,7 @@ def Gauss_Seidel():
             for j in range(i + 1, size):
                 if np.abs(matriz[indices[j], i]) > np.abs(matriz[indices[i], i]):
                     indices[i], indices[j] = indices[j], indices[i]
-        return matriz[indices], matrizB[indices]
+                    return matriz[indices], matrizB[indices]
 
     # Intento de reordenamiento si no es dominante
     if not es_dominante(matrizA):
@@ -163,22 +164,21 @@ def Gauss_Jordan():
     print(matrizA)
 
 def menu():
-    print("1. Calculadora mediante Gauss Seidel")
+    print("1. Calculadora mediante eliminación gaussiana")
     print("2. Calculadora mediante Gauss - Jordan")
-    print("3, Calculadora mediante el metodo Gaussiano")
+    print("3. Calculadora mediante Gauss-Seidel")
 
 
 while flag:
     os.system('cls')
-
     menu()
     opcion = int(input("Ingresa la opción deseada: "))
     if opcion == 1:
-        Gauss_Seidel()
+        Gaussiana()
     elif opcion == 2:
         Gauss_Jordan()
     elif opcion == 3:
-        Gaussiana()
+        Gauss_Seidel()
 
 
     resp = input("¿Quieres ingresar otro sistema de ecuaciones? (S/N): ")
