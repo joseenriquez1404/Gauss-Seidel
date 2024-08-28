@@ -128,6 +128,7 @@ def Gauss_Seidel():
             else:
                 Errors[i] = np.inf  # Manejar el error adecuadamente
 
+
     for i in range(size):
         print(f"El valor de X{i + 1} es: {valuesX[i]}")
 
@@ -163,10 +164,48 @@ def Gauss_Jordan():
     print("Matriz resultante (identidad a la izquierda y soluciones a la derecha):")
     print(matrizA)
 
+def Montante():
+    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
+    matrizA = np.zeros((size, size + 1), dtype=int)
+
+    matrizB = np.zeros((size, size + 1), dtype=int)
+    pivAnt = 1
+
+    # Solicitar los valores de la matriz
+    for i in range(size):
+        for j in range(size + 1):
+            matrizA[i, j] = int(input(f"Ingrese el valor para la posición ({i + 1}, {j + 1}): "))
+
+    # Aplicar la eliminación de Gauss
+    for fila in range(size):
+        pivAct = matrizA[fila][fila]
+
+        # Actualizar la matriz fila por fila
+        for fila_j in range(size):
+            if fila_j != fila:  # No modificar la fila del pivote actual
+                for columna in range(size + 1):
+                    matrizB[fila_j][columna] = ((matrizA[fila][fila] * matrizA[fila_j][columna]) -
+                                                (matrizA[fila_j][fila] * matrizA[fila][columna])) / pivAnt
+
+        # Actualizar el pivote anterior
+        pivAnt = pivAct
+
+    terminos_independientes = matrizB[:,-1]
+
+    for fila in range(size):
+        for columna in range(size):
+            if (fila == columna):
+                terminos_independientes[fila] = terminos_independientes[fila] / matrizB[fila][fila]
+    # Imprimir la matriz resultante
+
+    print("La matriz B resultante es:")
+    print(terminos_independientes)
+
 def menu():
     print("1. Calculadora mediante eliminación gaussiana")
     print("2. Calculadora mediante Gauss - Jordan")
     print("3. Calculadora mediante Gauss-Seidel")
+    print("4. Calculadora mediante Montante")
 
 
 while flag:
@@ -179,6 +218,8 @@ while flag:
         Gauss_Jordan()
     elif opcion == 3:
         Gauss_Seidel()
+    elif opcion == 4:
+        Montante()
 
 
     resp = input("¿Quieres ingresar otro sistema de ecuaciones? (S/N): ")
