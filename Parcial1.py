@@ -3,32 +3,38 @@ import os
 #Esto es una calculadora de sistemas de ecuaciones usando el metodo de Gauss Seidel
 flag = True
 
-
-def Gaussiana():
-    flag = False
-    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size + 1), dtype=float)
-
-    # Llenar la matriz con los valores ingresados por el usuario
+def ingresar_datos(matrizA, size):
     for i in range(size):
-        for j in range(size + 1):
-            matrizA[i][j] = float(input(f"Ingresa el elemento de la posición ({i + 1}, {j + 1}): "))
+        for j in range(size+1):
+            matrizA[i][j] = float(input(f"Ingresa el valor de la posición {i+1} , {j+1}: "))
+
+def reordenar_filas(matrizA, size):
+    cambio = False
+    for fila in range(size):
+        if (matrizA[fila][fila] == 0):
+            iteracion = 0
+            while (cambio == False) and (iteracion < size):
+                if (fila != iteracion):
+                    if(matrizA[iteracion][fila] != 0):
+                        matrizA[[fila, iteracion]] = matrizA[[iteracion, fila]]
+                        cambio = True
+                iteracion = iteracion + 1
+        cambio = False
+    print(matrizA)
+
+
+def Gaussiana(matrizA, size):
+
+    reordenar_filas(matrizA, size)
+    flag = True
 
     diagonal = np.diagonal(matrizA)
 
-    # Verificar si hay un 0 en la diagonal principal
     for fila in range(size):
-        if diagonal[fila] == 0:
-            flag = True
-            # Intentar intercambiar filas
-            for k in range(fila + 1, size):
-                if not np.isclose(matrizA[k, fila], 0):
-                    matrizA[[fila, k]] = matrizA[[k, fila]]  # Intercambiar filas
-                    diagonal = np.diagonal(matrizA)  # Actualizar la diagonal
-                    flag = False
-                    break
+        if (diagonal[fila] == 0):
+            flag = False
 
-    if not flag:
+    if flag:
         for k in range(size):
             for i in range(k + 1, size):
                 if matrizA[k][k] != 0:  # Evitar división por 0
@@ -59,19 +65,12 @@ def Gaussiana():
 
 
 
-def Gauss_Seidel():
-    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size+1), dtype=float)
+def Gauss_Seidel(matrizA):
     matrizB = np.zeros(size, dtype=float)
     valuesX = np.zeros(size, dtype=float)
     PastValues = np.zeros(size, dtype=float)
     Errors = np.full(size, 100, dtype=float)
     iteracion = 0
-
-    # Solicitud de datos
-    for i in range(size):
-        for j in range(size+1):
-            matrizA[i, j] = float(input(f"Ingrese el valor para la posición ({i + 1}, {j + 1}): "))
 
     matrizB = matrizA[:, -1]
 
@@ -132,27 +131,11 @@ def Gauss_Seidel():
     for i in range(size):
         print(f"El valor de X{i + 1} es: {valuesX[i]}")
 
-def Gauss_Jordan():
-    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size + 1), dtype=float)
+def Gauss_Jordan(matrizA, size):
+
+    reordenar_filas(matrizA, size)
 
     for i in range(size):
-        for j in range(size + 1):
-            matrizA[i, j] = float(input(f"Ingresa el valor de la posición ({i + 1}, {j + 1}): "))
-
-    for i in range(size):
-        # Verificar si el pivote es 0
-        if matrizA[i, i] == 0:
-            # Buscar una fila para intercambiar
-            for k in range(i + 1, size):
-                if matrizA[k, i] != 0:
-                    # Intercambiar filas
-                    matrizA[[i, k]] = matrizA[[k, i]]
-                    break
-            else:
-                raise ValueError(
-                    f"No se puede continuar porque el pivote en la posición {i + 1} es 0 y no se encontró una fila para intercambiar.")
-
         # Normalizar la fila actual
         matrizA[i] = matrizA[i] / matrizA[i, i]
 
@@ -164,17 +147,9 @@ def Gauss_Jordan():
     print("Matriz resultante (identidad a la izquierda y soluciones a la derecha):")
     print(matrizA)
 
-def Montante():
-    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
-    matrizA = np.zeros((size, size + 1), dtype=int)
-
+def Montante(matrizA):
     matrizB = np.zeros((size, size + 1), dtype=int)
     pivAnt = 1
-
-    # Solicitar los valores de la matriz
-    for i in range(size):
-        for j in range(size + 1):
-            matrizA[i, j] = int(input(f"Ingrese el valor para la posición ({i + 1}, {j + 1}): "))
 
     # Aplicar la eliminación de Gauss
     for fila in range(size):
@@ -212,16 +187,20 @@ while flag:
     os.system('cls')
     menu()
     opcion = int(input("Ingresa la opción deseada: "))
+    size = int(input("Ingresa el tamaño del sistema de ecuaciones: "))
+    matrizA = np.zeros((size, size + 1), dtype=float)
+    ingresar_datos(matrizA, size)
     if opcion == 1:
-        Gaussiana()
+        Gaussiana(matrizA, size)
     elif opcion == 2:
-        Gauss_Jordan()
+        Gauss_Jordan(matrizA, size)
     elif opcion == 3:
-        Gauss_Seidel()
+        Gauss_Seidel(matrizA, size)
     elif opcion == 4:
-        Montante()
+        Montante(matrizA)
 
 
     resp = input("¿Quieres ingresar otro sistema de ecuaciones? (S/N): ")
     if(resp == "N" or resp == "n"):
         flag = False
+    os.system('cls')
