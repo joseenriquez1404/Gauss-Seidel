@@ -22,6 +22,43 @@ def reordenar_filas(matrizA, size):
         cambio = False
     print(matrizA)
 
+def reordenar_columnas(matrizA, size):
+
+    for fila in range(size):
+        suma = 0
+        for columna in range(size):
+            if columna != fila:
+                suma += np.abs(matrizA[fila][columna])
+
+        if np.abs(matrizA[fila][fila]) < suma:
+            # Busca la columna con el mayor valor absoluto fuera de la diagonal
+            max_col = -1
+            max_val = -1
+            for iteracion in range(size-1):
+                if iteracion != fila:
+                    if np.abs(matrizA[fila][iteracion]) > max_val:
+                        max_val = np.abs(matrizA[fila][iteracion])
+                        max_col = iteracion
+
+            if max_col != -1:
+                # Intercambia columnas para hacer la matriz diagonalmente dominante
+                matrizA[:, [fila, max_col]] = matrizA[:, [max_col, fila]]
+
+
+    print(matrizA)
+
+def Dominante(matrizA, size):
+    for fila in range(size):
+        suma_fuera_diagonal = 0
+        for columna in range(size):
+            if columna != fila:
+                suma_fuera_diagonal += np.abs(matrizA[fila][columna])
+        if np.abs(matrizA[fila][fila]) < suma_fuera_diagonal:
+            return False
+    return True
+
+
+
 
 def Gaussiana(matrizA, size):
 
@@ -65,7 +102,7 @@ def Gaussiana(matrizA, size):
 
 
 
-def Gauss_Seidel(matrizA):
+def Gauss_Seidel(matrizA, size):
     matrizB = np.zeros(size, dtype=float)
     valuesX = np.zeros(size, dtype=float)
     PastValues = np.zeros(size, dtype=float)
@@ -77,59 +114,42 @@ def Gauss_Seidel(matrizA):
     Error_Deseado = float(input("Ingresa el error deseado: "))
 
     # Verificación de dominancia diagonal
-    def es_dominante(matriz):
-        diagonal = np.diagonal(matriz)
-        for i in range(size):
-            for j in range(size - 1):
-                suma = np.sum(np.abs(matrizA[i][j])) - np.abs(diagonal[i])
-                if np.abs(diagonal[i]) < suma:
-                    return False
-        return True
+    reordenar_columnas(matrizA, size)
+    reordenar_filas(matrizA, size)
 
-    # Reordenamiento de la matriz
-    def reordenar_matriz(matriz, matrizB):
-        indices = np.arange(size)
-        for i in range(size):
-            for j in range(i + 1, size):
-                if np.abs(matriz[indices[j], i]) > np.abs(matriz[indices[i], i]):
-                    indices[i], indices[j] = indices[j], indices[i]
-                    return matriz[indices], matrizB[indices]
+    dominante = Dominante(matrizA, size)
+    if dominante:
 
-    # Intento de reordenamiento si no es dominante
-    if not es_dominante(matrizA):
-        matrizA, matrizB = reordenar_matriz(matrizA, matrizB)
-        if not es_dominante(matrizA):
-            print("No fue posible reordenar el sistema para que sea diagonalmente dominante.")
-            return
+        diagonal = np.diagonal(matrizA)
 
-    diagonal = np.diagonal(matrizA)
+        while np.any(np.abs(Errors) > Error_Deseado):
 
-    while np.any(np.abs(Errors) > Error_Deseado):
+            iteracion += 1
+            PastValues[:] = valuesX
 
-        iteracion += 1
-        PastValues[:] = valuesX
+            for i in range(size):
+                suma = 0
+                for j in range(size):
+                    if j != i:
+                        suma += matrizA[i, j] * valuesX[j]
 
-        for i in range(size):
-            suma = 0
-            for j in range(size):
-                if j != i:
-                    suma += matrizA[i, j] * valuesX[j]
+                if diagonal[i] != 0:  # Verificar que no se divida por 0
+                    valuesX[i] = (matrizB[i] - suma) / diagonal[i]
+                else:
+                    print(f"División por 0 evitada en la fila {i + 1}")
+                    return  # O manejar de otra manera
 
-            if diagonal[i] != 0:  # Verificar que no se divida por 0
-                valuesX[i] = (matrizB[i] - suma) / diagonal[i]
-            else:
-                print(f"División por 0 evitada en la fila {i + 1}")
-                return  # O manejar de otra manera
+            for i in range(size):
+                if valuesX[i] != 0:  # Evitar división por 0 al calcular el error
+                    Errors[i] = np.abs((valuesX[i] - PastValues[i]) / valuesX[i]) * 100
+                else:
+                    Errors[i] = np.inf  # Manejar el error adecuadamente
+
 
         for i in range(size):
-            if valuesX[i] != 0:  # Evitar división por 0 al calcular el error
-                Errors[i] = np.abs((valuesX[i] - PastValues[i]) / valuesX[i]) * 100
-            else:
-                Errors[i] = np.inf  # Manejar el error adecuadamente
-
-
-    for i in range(size):
-        print(f"El valor de X{i + 1} es: {valuesX[i]}")
+            print(f"El valor de X{i + 1} es: {valuesX[i]}")
+    else:
+        print("El sistema no es diagonalmente dominante")
 
 def Gauss_Jordan(matrizA, size):
 
