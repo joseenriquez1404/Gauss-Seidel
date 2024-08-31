@@ -156,51 +156,31 @@ def Gauss_Jordan(matrizA, size):
     reordenar_filas(matrizA, size)
 
     for i in range(size):
-        # Normalizar la fila actual
+        # Verificar si el pivote es cero para evitar errores
+        if matrizA[i, i] == 0:
+            raise ValueError(f"El pivote en la fila {i} es cero. No se puede continuar con la eliminación Gauss-Jordan.")
+
+        # Normalizar la fila actual, incluyendo la última columna
         matrizA[i] = matrizA[i] / matrizA[i, i]
 
         # Eliminar las otras entradas en la columna i
         for j in range(size):
             if i != j:
-                matrizA[j] = matrizA[j] - matrizA[i] * matrizA[j, i]
+                factor = matrizA[j, i]
+                matrizA[j] = matrizA[j] - factor * matrizA[i]
 
-    print("Matriz resultante (identidad a la izquierda y soluciones a la derecha):")
-    print(matrizA)
+    # Extraer las soluciones de la última columna
+    soluciones = matrizA[:, -1]
 
-def Montante(matrizA):
-    matrizB = np.zeros((size, size + 1), dtype=int)
-    pivAnt = 1
-
-    # Aplicar la eliminación de Gauss
-    for fila in range(size):
-        pivAct = matrizA[fila][fila]
-
-        # Actualizar la matriz fila por fila
-        for fila_j in range(size):
-            if fila_j != fila:  # No modificar la fila del pivote actual
-                for columna in range(size + 1):
-                    matrizB[fila_j][columna] = ((matrizA[fila][fila] * matrizA[fila_j][columna]) -
-                                                (matrizA[fila_j][fila] * matrizA[fila][columna])) / pivAnt
-
-        # Actualizar el pivote anterior
-        pivAnt = pivAct
-
-    terminos_independientes = matrizB[:,-1]
-
-    for fila in range(size):
-        for columna in range(size):
-            if (fila == columna):
-                terminos_independientes[fila] = terminos_independientes[fila] / matrizB[fila][fila]
-    # Imprimir la matriz resultante
-
-    print("La matriz B resultante es:")
-    print(terminos_independientes)
+    # Imprimir los resultados de las incógnitas
+    print("Los valores de las incógnitas son:")
+    for i in range(size):
+        print(f"x{i+1} = {soluciones[i]}")
 
 def menu():
     print("1. Calculadora mediante eliminación gaussiana")
     print("2. Calculadora mediante Gauss - Jordan")
     print("3. Calculadora mediante Gauss-Seidel")
-    print("4. Calculadora mediante Montante")
 
 
 while flag:
@@ -216,8 +196,6 @@ while flag:
         Gauss_Jordan(matrizA, size)
     elif opcion == 3:
         Gauss_Seidel(matrizA, size)
-    elif opcion == 4:
-        Montante(matrizA)
 
 
     resp = input("¿Quieres ingresar otro sistema de ecuaciones? (S/N): ")
